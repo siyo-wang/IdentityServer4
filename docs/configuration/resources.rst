@@ -1,20 +1,20 @@
-Defining Resources
+资源数据配置
 ==================
 
-The first thing you will typically define in your system are the resources that you want to protect.
-That could be identity information of your users, like profile data or email addresses, or access to APIs.
+在系统中，你首先需要决定那些资源你想保护。
+这可能是用户的身份信息，比如：简介信息，邮件地址等， 或者要访问的APIs
 
-.. note:: You can define resources using a C# object model - or load them from a data store. An implementation of ``IResourceStore`` deals with these low-level details. For this document we are using the in-memory implementation.
+..注意:: 你可以使用C#对象模型声明资源 - 或者从数据库中装载这些资源.  ``IResourceStore`` 的具体实现处理技术细节. 本教程我们使用简化的内存实现类来声明资源.
 
-Defining identity resources
+添加一个身份资源
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Identity resources are data like user ID, name, or email address of a user.
-An identity resource has a unique name, and you can assign arbitrary claim types to it. These claims will then be included in the identity token for the user.
-The client will use the ``scope`` parameter to request access to an identity resource.
+身份资源是诸如用户ID，姓名或者用户邮件地址这样的数据。
+一个身份资源有系统唯一名字，你可以给这个名字任意指定声明类型。 这些声明会被包括在身份令牌中， 传给用户。
+客户将使用  ``scope`` 参数来请求访问一个身份资源.
 
-The OpenID Connect specification specifies a couple of `standard <https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims>`_ identity resources.
-The minimum requirement is, that you provide support for emitting a unique ID for your users - also called the subject id.
-This is done by exposing the standard identity resource called ``openid``::
+OpenID 连接规格指定了一系列 `标准 <https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims>`_ 身份资源.
+最小需求是，你需要给每个用户提供一个唯一编号 - 也被称为 subject id.
+这是通过暴露叫做``openid``的标准身份资源来实现::
 
     public static IEnumerable<IdentityResource> GetIdentityResources()
     {
@@ -24,8 +24,8 @@ This is done by exposing the standard identity resource called ``openid``::
         };
     }
 
-The `IdentityResources` class supports all scopes defined in the specification (openid, email, profile, telephone, and address).
-If you want to support them all, you can add them to your list of supported identity resources::
+这个 `IdentityResources` 类支持所有规格中定义的范围（资源）比如(openid, email, profile, telephone, and address).
+如果想支持所有的标准资源，你可以把这些标准资源加入到身份资源列表中::
 
     public static IEnumerable<IdentityResource> GetIdentityResources()
     {
@@ -39,17 +39,16 @@ If you want to support them all, you can add them to your list of supported iden
         };
     }
 
-Defining custom identity resources
+添加用户自定义身份资源
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-You can also define custom identity resources. Create a new `IdentityResource` class, give it a name and optionally a display name and description 
-and define which user claims should be included in the identity token when this resource gets requested::
-
+你也可以定义自己的身份资源. 创建一个 `IdentityResource` 类, 提供一个身份资源名称，愿意的话还可以提供显示名称及描述，以及定义请求这个资源的时候，那些用户声明需要包括在身份令牌中::
+ 
     public static IEnumerable<IdentityResource> GetIdentityResources()
     {
         var customProfile = new IdentityResource(
             name: "custom.profile",
-            displayName: "Custom profile",
-            claimTypes: new[] { "name", "email", "status" });
+            displayName: "Custom profile",//可以不提供，这个不是必须的
+            claimTypes: new[] { "name", "email", "status" });//用户请求自定义的身份资源的时候，将返回这些声明
 
         return new List<IdentityResource>
         {
@@ -59,13 +58,13 @@ and define which user claims should be included in the identity token when this 
         };
     }
 
-See the :ref:`reference <refIdentityResource>` section for more information on identity resource settings.
+请参见 :ref:`reference <refIdentityResource>` 节了解更多的身份资源的设置。
 
-Defining API resources
+添加API资源
 ^^^^^^^^^^^^^^^^^^^^^^
-To allow clients to request access tokens for APIs, you need to define API resources, e.g.::
+为了让客户申请APIs的访问令牌，你需要定义一个API资源, 比如::
 
-To get access tokens for APIs, you also need to register them as a scope. This time the scope type is of type `Resource`::
+为了得到APIs的访问令牌，你也需要把他们注册成一个范围(scope)。 这个范围(scope)的类型是`Resource`::
 
     public static IEnumerable<ApiResource> GetApis()
     {
@@ -107,4 +106,4 @@ To get access tokens for APIs, you also need to register them as a scope. This t
         };
     }
 
-See the :ref:`reference <refApiResource>` section for more information on API resource settings.
+请参看 :ref:`reference <refApiResource>` 节关于API资源的设置细节.

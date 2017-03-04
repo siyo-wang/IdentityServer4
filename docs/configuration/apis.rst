@@ -1,8 +1,6 @@
-Protecting APIs
+保护APIs（Protecting APIs）
 ===============
-
-Protecting APIs with access tokens issued by your identityserver is easy - simply add our token validation middleware
-to the ASP.NET Core pipeline and configure the identityserver base address and the scope::
+使用IdentityServer的访问令牌可以保护APIs接口的访问。非常简单-只需要把令牌验证中间件加入到Asp.net Core的管道中，并且配置IdentityServer的地址和访问范围即可::
 
     public class Startup
     {
@@ -10,30 +8,31 @@ to the ASP.NET Core pipeline and configure the identityserver base address and t
         {
             app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
             {
-                Authority = "https://demo.identityserver.io",
-                AllowedScopes = { "api1" },
-            });
+                Authority = "https://demo.identityserver.io",//指定identityserver的地址
+                AllowedScopes = { "api1" },//指定允许访问的范围(api1)
+            });
 
             app.UseMvc();
         }
     }
 
-You can get the middleware from `nuget <https://www.nuget.org/packages/IdentityServer4.AccessTokenValidation/>`_ 
-or `github <https://github.com/IdentityServer/IdentityServer4.AccessTokenValidation>`_.
+中间件可以通过 `nuget <https://www.nuget.org/packages/IdentityServer4.AccessTokenValidation/>`_ 
+或者 `github <https://github.com/IdentityServer/IdentityServer4.AccessTokenValidation>`_ 得到.
 
-**Note on Targeting Earlier .NET Frameworks**
+**如果要用于非Asp.net core的早期.Net框架**
 
-When the middleware calls the configured metadata endpoint during token validation, you may encounter runtime exceptions related to SSL/TLS failures if you are targeting your build to an earlier .NET Framework (for example, NET452) due to the default configuration for HTTPS communication found in earlier versions of the framework.  If this occurs, you can avoid the problem by enabling support for the latest versions of TLS through your security protocol configuration located within ServicePointManager.  The code can go in your Startup.cs for example, and would be as follows::
+由于早期.net框架(如：NET452）的默认的HTTPS 通讯配置原因，在早期的.Net框架(如：NET452）使用这个中间件在配置令牌验证的metadata endpoint,可能会有运行时的SSL/TLS失败异常。如果遇到这样的异常，可以通过在ServicePointManager的安全协议配置里启用最新版本的TLS避免, 把下面的示例代码放到你API工程的Startup.cs类中来解决::
 
     #if NET452
         System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
     #endif
-
-The highest level error you will likely see will be:
+    
+最外层的异常会是类似于下面:
     
     System.InvalidOperationException: IDX10803: Unable to obtain configuration from: 'https://MYWEBSITE.LOCAL/.well-known/openid-configuration'.
 
-The originating error will reflect something similar to the following:
-    
+内部原始异常(inner exception)会类似于下面的信息:
+
     System.Security.Authentication.AuthenticationException: A call to SSPI failed, see inner exception. ---> System.ComponentModel.Win32Exception: The client and server cannot communicate, because they do not possess a common algorithm
 
+ 

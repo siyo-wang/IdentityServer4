@@ -1,21 +1,23 @@
-Defining Clients
+客户配置(Defining Clients)
 ================
 
-Clients represent applications that can request tokens from your identityserver.
+客户就是那些需要从identityserver申请令牌的应用程序。
 
-The details vary, but you typically define the following common settings for a client:
+认证服务的客户的细节有很多不同的解释，一般来说，我们认为客户有下面共同的特点（设置）:
 
-* a unique client ID
-* a secret if needed
-* the allowed interactions with the token service (called a grant type)
-* a network location where identity and/or access token gets sent to (called a redirect URI)
-* a list of scopes (aka resources) the client is allowed to access
+* 一个唯一的客户ID
+* 一个密钥（如果需要）
+* 允许和令牌服务交互的方式(也叫授权类型)
+* 一个网络地址，用于接收身份(identity)或者访问令牌信息(也叫重定向URI)
+* 这个客户允许访问的范围(也被称为资源)列表
 
-.. Note:: At runtime, clients are retrieved via an implementation of the ``IClientStore``. This allows loading them from arbitrary data sources like config files or databases. For this document we gonna use the in-memory version of the client store. You can wire up the in-memory store in ``ConfigureServices`` via the ``AddInMemoryClients`` extensions method.
 
-Defining a client for server to server communication
+..注意:: 在运行时，客户是通过``IClientStore``的实现来获取的. 客户信息可以从任意的数据源获取，如配置文件或者数据库。本教程我们使用内存版的客户信息存储实现.你可以通过``AddInMemoryClients``de ``AddInMemoryClients``扩展方法来应用内存版的客户存储实现  
+
+
+用于服务器到服务器通讯用的客户
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-In this scenario no interactive user is present - a service (aka client) wants to communicate with an API (aka scope)::
+这种场景中没有交换用户参与 - 一个服务（也就是客户）请求和一个API(也叫范围）通讯::
 
     public class Clients
     {
@@ -26,18 +28,18 @@ In this scenario no interactive user is present - a service (aka client) wants t
                 new Client
                 {
                     ClientId = "service.client",                    
-                    ClientSecrets = { new Secret("secret".Sha256()) },
+                    ClientSecrets = { new Secret("secret".Sha256()) },//密码
 
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    AllowedGrantTypes = GrantTypes.ClientCredentials,//客户身份信息登录，也就是用客户id和secret认证客户。
                     AllowedScopes = { "api1", "api2.read_only" }
                 }
             };
         }
     }
 
-Defining browser-based JavaScript client (e.g. SPA) for user authentication and delegated access and API
+基于浏览器的Javascript客户（如：单页面应用） 请求用户认证、委托访问及API
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-This client uses the so called implicit flow to request an identity and access token from JavaScript::
+这种客户使用所谓的隐式流(implicit flow)，从javascript请求身份信息和访问令牌::
 
     var jsClient = new Client
     {
@@ -64,11 +66,11 @@ This client uses the so called implicit flow to request an identity and access t
 
 .. _startClientsMVC:
 
-Defining a server-side web application (e.g. MVC) for use authentication and delegated API access
+服务端Web应用（如：MVC）客户，请求认证和代理API访问
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Interactive server side (or native desktop/mobile) applications use the hybrid flow.
-This flow gives you the best security because the access tokens are transmitted via back-channel calls only (and gives you access to refresh tokens)::
-
+交互式的服务端客户（或者 原生的桌面/移动应用）使用混合流(hybrid flow)。
+这种流处理提供最好的安全性，因为访问令牌只在后台对后台的调用中出现，访问令牌不会出现在最终用户的电脑上。（这种方式也提供刷新令牌）::
+ 
     var mvcClient = new Client
     {
         ClientId = "mvc",

@@ -1,18 +1,17 @@
-Connecting an MVC Application
+连接MVC应用
 =============================
 
-You can integrate identityserver into your MVC application to authenticate users and request access token.
+你可以把identityserver集成到你的MVC应用中，来认证用户和请求访问令牌。
 
-An MVC application typically uses the hybrid flow - use :ref:`this <startClientsMVC>` sample
-to register the client.
+MVC应用一般使用混合流（hybrid flow）使用 :ref:`this <startClientsMVC>` 示例来注册客户.
 
-In your MVC application startup, you can use the standard Microsoft ASP.NET OpenID Connect middleware to connect to identityserver::
+在MVC应用的startup, 你可以用标准的microsoft ASP.NET OpenID Connect 中间件来连接 identityserver::
 
     public class Startup
     {
         public void Configure(IApplicationBuilder app)
         {
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();//取消微软默认的claims转换，使用原有短名称
             
             app.UseStaticFiles();
 
@@ -33,7 +32,7 @@ In your MVC application startup, you can use the standard Microsoft ASP.NET Open
                 ResponseType = "code id_token",
                 SaveTokens = true,
                 GetClaimsFromUserInfoEndpoint = true,
-                
+                 
                 TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = "name",
