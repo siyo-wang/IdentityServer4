@@ -46,19 +46,19 @@
     ``plain`` 使用明码发送授权码争议。（不推荐）
     ``S256`` 使用SHA256散列授权码争议。
 ``login_hint``
-    can be used to pre-fill the username field on the login page
+    用来在登录界面预填充用户名字段
 ``ui_locales``
-    gives a hint about the desired display language of the login UI
+    登录界面显示语言的提示信息，登录界面可以根据这个信息调整界面的文字
 ``max_age``
-    if the user's logon session exceeds the max age (in seconds), the login UI will be shown
+    登录会话的有效时间，超过后，登录界面将显示
 ``acr_values``
-    allows passing in additional authentication related information - identityserver special cases the following proprietary acr_values:
+    允许传入用于认证的附加信息--identityserver特别情形使用下面的acr_values:
+        
+        ``idp:name_of_idp`` 跳过登录/主页的真实界面，把用户直接重定向到选择的身份验证者（如：google）（如果允许按照每个客户端配置）
         
-        ``idp:name_of_idp`` bypasses the login/home realm screen and forwards the user directly to the selected identity provider (if allowed per client configuration)
-        
-        ``tenant:name_of_tenant`` can be used to pass a tenant name to the login UI
+        ``tenant:name_of_tenant`` 可以被作为一个租户名字传到登录界面
 
-**Example**
+**例子**
 
 ::
 
@@ -70,12 +70,12 @@
         state=abc&
         nonce=xyz 
 
-(URL encoding removed, and line breaks added for readability)
+(为了显示清楚， URL没有转码，分行显示)
 
 
 IdentityModel
 ^^^^^^^^^^^^^
-You can programmatically create URLs for the authorize endpoint using the `IdentityModel <https://github.com/IdentityModel/IdentityModel2>`_ library::
+你可以用 `IdentityModel <https://github.com/IdentityModel/IdentityModel2>`_ 库来创建授权端点URL::
 
     var request = new AuthorizeRequest(doc.AuthorizeEndpoint);
     var url = request.CreateAuthorizeUrl(
@@ -86,7 +86,7 @@ You can programmatically create URLs for the authorize endpoint using the `Ident
         state:       CryptoRandom.CreateUniqueId(),
         nonce:       CryptoRandom.CreateUniqueId());
 
-..and parse the response::
+..并且从响应中获得信息::
 
     var response = new AuthorizeResponse(url);
 
